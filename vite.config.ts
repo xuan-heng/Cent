@@ -1,13 +1,13 @@
-import { resolve } from "node:path"
-import tailwindcss from "@tailwindcss/vite"
-import react from "@vitejs/plugin-react"
-import { buildSync } from "esbuild"
-import Info from "unplugin-info/vite"
-import { defineConfig, type PluginOption } from "vite"
-import { analyzer } from "vite-bundle-analyzer"
-import { createHtmlPlugin } from "vite-plugin-html"
-import { VitePWA } from "vite-plugin-pwa"
-import svgr from "vite-plugin-svgr"
+import { resolve } from "node:path";
+import tailwindcss from "@tailwindcss/vite";
+import react from "@vitejs/plugin-react";
+import { buildSync } from "esbuild";
+import Info from "unplugin-info/vite";
+import { defineConfig, type PluginOption } from "vite";
+import { analyzer } from "vite-bundle-analyzer";
+import { createHtmlPlugin } from "vite-plugin-html";
+import { VitePWA } from "vite-plugin-pwa";
+import svgr from "vite-plugin-svgr";
 
 // ========== 顶层静态构建 plugins ==========
 const shouldAnalyze = process.env.ANALYZE === "true";
