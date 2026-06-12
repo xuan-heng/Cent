@@ -77,16 +77,16 @@ export default defineConfig({
             output: {
                 manualChunks: (id) => {
                     if (id.includes("zod")) {
-                        return "zod"
+                        return "zod";
                     }
                     if (id.includes("@dnd-kit")) {
-                        return "dndkit"
+                        return "dndkit";
                     }
                     if (id.includes("echarts")) {
-                        return "echarts"
+                        return "echarts";
                     }
                     if (id.includes("react-day-picker")) {
-                        return "reactDayPicker"
+                        return "reactDayPicker";
                     }
                 },
             },
