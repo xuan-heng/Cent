@@ -52,12 +52,12 @@ export default defineConfig(({ mode }) => {
                     description: "Accounting your life - 记录每一天",
                     theme_color: "#ffffff",
                     icons: [
-                        { 
+                        {
                             src: "icon.png",
                             sizes: "192x192",
                             type: "image/png",
                         },
-                        { 
+                        {
                             src: "icon.png",
                             sizes: "512x512",
                             type: "image/png",
