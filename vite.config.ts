@@ -66,7 +66,7 @@ const plugins: PluginOption[] = [
 ]
 
 if (shouldAnalyze) {
-    plugins.push(analyzer())
+    plugins.push(analyzer());
 }
 
 // ========== 简化的 defineConfig ==========
