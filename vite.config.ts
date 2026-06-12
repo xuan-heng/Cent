@@ -10,11 +10,11 @@ import { VitePWA } from "vite-plugin-pwa"
 import svgr from "vite-plugin-svgr"
 
 // ========== 顶层静态构建 plugins ==========
-const shouldAnalyze = process.env.ANALYZE === "true"
+const shouldAnalyze = process.env.ANALYZE === "true";
 
 // 如果需要 mode 相关的 env，可以在这里手动加载
 // 注意：Cloudflare Pages 构建时 process.env 中会有对应的环境变量
-const VITE_GTAG_SCRIPT = process.env.VITE_GTAG_SCRIPT || ""
+const VITE_GTAG_SCRIPT = process.env.VITE_GTAG_SCRIPT || "";
 
 const plugins: PluginOption[] = [
     Info(),
@@ -63,7 +63,7 @@ const plugins: PluginOption[] = [
             },
         },
     }),
-]
+];
 
 if (shouldAnalyze) {
     plugins.push(analyzer());
@@ -109,4 +109,4 @@ export default defineConfig({
             },
         },
     },
-})
+});
