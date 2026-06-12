@@ -1,20 +1,20 @@
-import { resolve } from "node:path";
-import tailwindcss from "@tailwindcss/vite";
-import react from "@vitejs/plugin-react";
-import { buildSync } from "esbuild";
-import Info from "unplugin-info/vite";
-import { defineConfig, type PluginOption } from "vite";
-import { analyzer } from "vite-bundle-analyzer";
-import { createHtmlPlugin } from "vite-plugin-html";
-import { VitePWA } from "vite-plugin-pwa";
-import svgr from "vite-plugin-svgr";
+import { resolve } from "node:path"
+import tailwindcss from "@tailwindcss/vite"
+import react from "@vitejs/plugin-react"
+import { buildSync } from "esbuild"
+import Info from "unplugin-info/vite"
+import { defineConfig, type PluginOption } from "vite"
+import { analyzer } from "vite-bundle-analyzer"
+import { createHtmlPlugin } from "vite-plugin-html"
+import { VitePWA } from "vite-plugin-pwa"
+import svgr from "vite-plugin-svgr"
 
 // ========== 顶层静态构建 plugins ==========
-const shouldAnalyze = process.env.ANALYZE === "true";
+const shouldAnalyze = process.env.ANALYZE === "true"
 
 // 如果需要 mode 相关的 env，可以在这里手动加载
 // 注意：Cloudflare Pages 构建时 process.env 中会有对应的环境变量
-const VITE_GTAG_SCRIPT = process.env.VITE_GTAG_SCRIPT || "";
+const VITE_GTAG_SCRIPT = process.env.VITE_GTAG_SCRIPT || ""
 
 const plugins: PluginOption[] = [
     Info(),
@@ -63,23 +63,23 @@ const plugins: PluginOption[] = [
             },
         },
     }),
-];
+]
 
 if (shouldAnalyze) {
-    plugins.push(analyzer());
+    plugins.push(analyzer())
 }
 
 // ========== 简化的 defineConfig ==========
 export default defineConfig({
-    plugins,  // ← 直接引用，不是函数返回
+    plugins,
     build: {
         rollupOptions: {
             output: {
                 manualChunks: (id) => {
-                    if (id.includes("zod")) return "zod";
-                    if (id.includes("@dnd-kit")) return "dndkit";
-                    if (id.includes("echarts")) return "echarts";
-                    if (id.includes("react-day-picker")) return "reactDayPicker";
+                    if (id.includes("zod")) return "zod"
+                    if (id.includes("@dnd-kit")) return "dndkit"
+                    if (id.includes("echarts")) return "echarts"
+                    if (id.includes("react-day-picker")) return "reactDayPicker"
                 },
             },
         },
@@ -101,4 +101,4 @@ export default defineConfig({
             },
         },
     },
-});
+})
