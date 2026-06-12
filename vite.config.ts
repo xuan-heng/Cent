@@ -1,17 +1,17 @@
-import { resolve } from "node:path"
-import tailwindcss from "@tailwindcss/vite"
-import react from "@vitejs/plugin-react"
-import { buildSync } from "esbuild"
-import Info from "unplugin-info/vite"
-import { defineConfig, loadEnv } from "vite"
-import { analyzer } from "vite-bundle-analyzer"
-import { createHtmlPlugin } from "vite-plugin-html"
-import { VitePWA } from "vite-plugin-pwa"
-import svgr from "vite-plugin-svgr"
+import { resolve } from "node:path";
+import tailwindcss from "@tailwindcss/vite";
+import react from "@vitejs/plugin-react";
+import { buildSync } from "esbuild";
+import Info from "unplugin-info/vite";
+import { defineConfig, loadEnv } from "vite";
+import { analyzer } from "vite-bundle-analyzer";
+import { createHtmlPlugin } from "vite-plugin-html";
+import { VitePWA } from "vite-plugin-pwa";
+import svgr from "vite-plugin-svgr";
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
-    const env = loadEnv(mode, process.cwd())
+    const env = loadEnv(mode, process.cwd());
 
     // const shouldAnalyze = process.env.ANALYZE === "true"
 
@@ -76,16 +76,16 @@ export default defineConfig(({ mode }) => {
                 output: {
                     manualChunks: (id) => {
                         if (id.includes("zod")) {
-                            return "zod"
+                            return "zod";
                         }
                         if (id.includes("@dnd-kit")) {
-                            return "dndkit"
+                            return "dndkit";
                         }
                         if (id.includes("echarts")) {
-                            return "echarts"
+                            return "echarts";
                         }
                         if (id.includes("react-day-picker")) {
-                            return "reactDayPicker"
+                            return "reactDayPicker";
                         }
                     },
                 },
@@ -111,5 +111,5 @@ export default defineConfig(({ mode }) => {
                 },
             },
         },
-    }
-})
+    };
+});
