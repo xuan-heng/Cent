@@ -3,114 +3,102 @@ import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { buildSync } from "esbuild";
 import Info from "unplugin-info/vite";
-import { defineConfig, loadEnv, type PluginOption } from "vite";
+import { defineConfig, type PluginOption } from "vite";
 import { analyzer } from "vite-bundle-analyzer";
 import { createHtmlPlugin } from "vite-plugin-html";
 import { VitePWA } from "vite-plugin-pwa";
 import svgr from "vite-plugin-svgr";
 
-// https://vite.dev/config/
-export default defineConfig(({ mode }) => {
-    const env = loadEnv(mode, process.cwd());
+// ========== 顶层静态构建 plugins ==========
+const shouldAnalyze = process.env.ANALYZE === "true";
 
-    const shouldAnalyze = process.env.ANALYZE === "true";
+// 如果需要 mode 相关的 env，可以在这里手动加载
+// 注意：Cloudflare Pages 构建时 process.env 中会有对应的环境变量
+const VITE_GTAG_SCRIPT = process.env.VITE_GTAG_SCRIPT || "";
 
-    const plugins: PluginOption[] = [
-        Info(),
-        createHtmlPlugin({
-            inject: {
-                data: {
-                    VITE_GTAG_SCRIPT: env.VITE_GTAG_SCRIPT || "",
-                    injectPresetScript: buildSync({
-                        entryPoints: ["src/inline/load-preset.ts"],
-                        bundle: true,
-                        minify: true,
-                        write: false,
-                        format: "iife",
-                    }).outputFiles[0].text,
-                },
+const plugins: PluginOption[] = [
+    Info(),
+    createHtmlPlugin({
+        inject: {
+            data: {
+                VITE_GTAG_SCRIPT,
+                injectPresetScript: buildSync({
+                    entryPoints: ["src/inline/load-preset.ts"],
+                    bundle: true,
+                    minify: true,
+                    write: false,
+                    format: "iife",
+                }).outputFiles[0].text,
             },
-        }),
-        react(),
-        svgr(),
-        tailwindcss(),
-        VitePWA({
-            strategies: "injectManifest",
-            srcDir: "src",
-            filename: "sw.ts",
-            registerType: "autoUpdate",
-            injectRegister: "auto",
-            includeAssets: ["favicon.ico", "apple-touch-icon.png"],
-            manifest: {
-                name: "Cent - 日计",
-                short_name: "Cent",
-                description: "Accounting your life - 记录每一天",
-                theme_color: "#ffffff",
-                icons: [
-                    { src: "icon.png", sizes: "192x192", type: "image/png" },
-                    { src: "icon.png", sizes: "512x512", type: "image/png" },
-                ],
-                protocol_handlers: [
-                    {
-                        protocol: "cent-accounting",
-                        url: "/add-bills?text=%s",
-                        client_mode: "focus-existing", // 优先聚焦现有窗口
-                    } as any,
-                ],
-                launch_handler: {
-                    client_mode: ["navigate-existing", "auto"], // 优先在现有窗口导航
-                },
-                // 注意：标准 URL 链接唤起通过应用层面的 URL 参数处理实现
-                // 见 src/hooks/use-url-handler.tsx
+        },
+    }),
+    react(),
+    svgr(),
+    tailwindcss(),
+    VitePWA({
+        strategies: "injectManifest",
+        srcDir: "src",
+        filename: "sw.ts",
+        registerType: "autoUpdate",
+        injectRegister: "auto",
+        includeAssets: ["favicon.ico", "apple-touch-icon.png"],
+        manifest: {
+            name: "Cent - 日计",
+            short_name: "Cent",
+            description: "Accounting your life - 记录每一天",
+            theme_color: "#ffffff",
+            icons: [
+                { src: "icon.png", sizes: "192x192", type: "image/png" },
+                { src: "icon.png", sizes: "512x512", type: "image/png" },
+            ],
+            protocol_handlers: [
+                {
+                    protocol: "cent-accounting",
+                    url: "/add-bills?text=%s",
+                    client_mode: "focus-existing",
+                } as any,
+            ],
+            launch_handler: {
+                client_mode: ["navigate-existing", "auto"],
             },
-        }),
-    ];
+        },
+    }),
+];
 
-    if (shouldAnalyze) {
-        // 只有在环境变量 ANALYZE=true 时才添加分析插件
-        plugins.push(analyzer());
-    }
-    return {
-        plugins,
-        build: {
-            rollupOptions: {
-                output: {
-                    manualChunks: (id) => {
-                        if (id.includes("zod")) {
-                            return "zod";
-                        }
-                        if (id.includes("@dnd-kit")) {
-                            return "dndkit";
-                        }
-                        if (id.includes("echarts")) {
-                            return "echarts";
-                        }
-                        if (id.includes("react-day-picker")) {
-                            return "reactDayPicker";
-                        }
-                    },
+if (shouldAnalyze) {
+    plugins.push(analyzer());
+}
+
+// ========== 简化的 defineConfig ==========
+export default defineConfig({
+    plugins,  // ← 直接引用，不是函数返回
+    build: {
+        rollupOptions: {
+            output: {
+                manualChunks: (id) => {
+                    if (id.includes("zod")) return "zod";
+                    if (id.includes("@dnd-kit")) return "dndkit";
+                    if (id.includes("echarts")) return "echarts";
+                    if (id.includes("react-day-picker")) return "reactDayPicker";
                 },
             },
         },
-        resolve: {
-            alias: {
-                "@": resolve("./src"),
+    },
+    resolve: {
+        alias: {
+            "@": resolve("./src"),
+        },
+    },
+    worker: {
+        format: "es",
+    },
+    server: {
+        proxy: {
+            "/google-api": {
+                target: "https://generativelanguage.googleapis.com",
+                changeOrigin: true,
+                rewrite: (path) => path.replace(/^\/google-api/, ""),
             },
         },
-        worker: {
-            format: "es",
-        },
-        server: {
-            proxy: {
-                // 这里的 '/api' 是你在代码中调用的路径前缀
-                "/google-api": {
-                    target: "https://generativelanguage.googleapis.com", // 目标接口域名
-                    changeOrigin: true, // 必须设置为 true，以便绕过主机检查
-                    rewrite: (path) => path.replace(/^\/google-api/, ""), // 去掉路径中的前缀
-                    // 如果你的网络环境需要科学上网，且使用了本地代理软件，可能需要配置此项（可选）
-                    // secure: false,
-                },
-            },
-        },
-    };
+    },
 });
